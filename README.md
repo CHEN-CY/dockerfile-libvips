@@ -1,13 +1,13 @@
-# [Dockerfile](https://registry.hub.docker.com/u/marcbachmann/libvips/) for libvips
+# [Dockerfile](https://registry.hub.docker.com/u/wjordan/libvips/) for libvips
 
-Installs libvips on Ubuntu 14.04 as base image.
+Installs libvips on Ubuntu 15.04 as base image.
 
 
 ## Supported tags
 
-- [`7.40`](https://github.com/marcbachmann/dockerfile-libvips/tree/master)
-- [`7.42`](https://github.com/marcbachmann/dockerfile-libvips/tree/7.42.3)
-- [`8.0.2`, `latest`](https://github.com/marcbachmann/dockerfile-libvips/tree/8.0.2)
+- [`7.40`](https://github.com/wjordan/dockerfile-libvips/tree/master)
+- [`7.42`](https://github.com/wjordan/dockerfile-libvips/tree/7.42.3)
+- [`8.0.2`, `latest`](https://github.com/wjordan/dockerfile-libvips/tree/8.0.2)
 
 
 ## How to use
@@ -15,7 +15,7 @@ Installs libvips on Ubuntu 14.04 as base image.
 Download the image using:
 
 ```bash
-$ docker pull marcbachmann/libvips
+$ docker pull wjordan/libvips
 # .... pulling down image
 ```
 
