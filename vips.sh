@@ -2,26 +2,42 @@
 
 # Install dependencies
 apk --update add --virtual build-dependencies \
-  gcc g++ libc-dev make
-  automake \
+  gcc g++ make libc-dev \
   curl \
-  gobject-introspection \
-  gtk-doc \
-  glib-dev \
-  tar
+  automake \
+  libtool \
+  tar \
+  gettext
 
-apk --update add \
+apk --update add --virtual dev-dependencies \
+  glib-dev \
   libpng-dev \
   libwebp-dev \
-  tiff-dev \
   libexif-dev \
   libxml2-dev \
-  swig \
-  imagemagick-dev \
   fftw-dev \
+
+apk --update add --virtual run-dependencies \
+  glib \
+  libpng \
+  libwebp \
+  libexif \
+  libxml2 \
+  fftw \
+  fftw-libs \
   orc-dev \
-  pango-dev \
-  libgsf-dev
+
+# Building from git dependencies
+#  gobject-introspection \
+#  swig \
+#  gtk-doc \
+
+# Optional dependencies (unused)
+#  tiff-dev \
+#  libgsf-dev
+#  pango-dev \
+#  imagemagick-dev \
+
 
 # Build libvips
 cd /tmp
@@ -43,4 +59,5 @@ curl -O http://www.vips.ecs.soton.ac.uk/supported/$LIBVIPS_VERSION_MAJOR.$LIBVIP
 # Clean up
 cd /
 apk del build-dependencies
+apk del dev-dependencies
 rm -rf /var/cache/apk/* /tmp/* /var/tmp/*

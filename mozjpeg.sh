@@ -8,17 +8,20 @@ set -e
 
 cd /tmp
 apk --update add --virtual build-dependencies \
-  gcc g++ libc-dev \
+  gcc g++ make libc-dev \
   curl \
+  automake \
   autoconf \
-  make \
   nasm \
   pkgconf \
   libtool \
   tar
 
-apk --update add libpng-dev
+apk --update add --virtual dev-dependencies \
+  libpng-dev
 
+apk --update add \
+  libpng
 
 MOZJPEG_FILE=v$MOZJPEG_VERSION_MAJOR.$MOZJPEG_VERSION_MINOR.tar.gz
 curl -L -O https://github.com/mozilla/mozjpeg/archive/$MOZJPEG_FILE
@@ -32,4 +35,5 @@ cd build
 # Clean up
 cd /
 apk del build-dependencies
+apk del dev-dependencies
 rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
