@@ -5,17 +5,20 @@
 # $MOZJPEG_VERSION_MAJOR
 # $MOZJPEG_VERSION_MINOR
 set -e
-apt-get update
 
 cd /tmp
-DEBIAN_FRONTEND=noninteractive apt-get install -y \
+apk --update add --virtual build-dependencies \
+  gcc g++ libc-dev \
   curl \
   autoconf \
   make \
   nasm \
-  pkg-config \
+  pkgconf \
   libtool \
-  libpng12-dev \
+  tar
+
+apk --update add libpng-dev
+
 
 MOZJPEG_FILE=v$MOZJPEG_VERSION_MAJOR.$MOZJPEG_VERSION_MINOR.tar.gz
 curl -L -O https://github.com/mozilla/mozjpeg/archive/$MOZJPEG_FILE
@@ -28,14 +31,5 @@ cd build
 
 # Clean up
 cd /
-apt-get remove -y \
-  curl \
-  autoconf \
-  make \
-  nasm \
-  pkg-config \
-  libtool && \
-  apt-get autoremove -y && \
-  apt-get autoclean && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+apk del build-dependencies
+rm -rf /var/cache/apk/* /tmp/* /var/tmp/*

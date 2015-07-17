@@ -1,22 +1,27 @@
 #!/bin/bash
 
 # Install dependencies
-apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  automake build-essential curl \
+apk --update add --virtual build-dependencies \
+  gcc g++ libc-dev make
+  automake \
+  curl \
   gobject-introspection \
-  gtk-doc-tools \
-  libglib2.0-dev \
-  libpng12-dev \
+  gtk-doc \
+  glib-dev \
+  tar
+
+apk --update add \
+  libpng-dev \
   libwebp-dev \
-  libtiff5-dev \
+  tiff-dev \
   libexif-dev \
   libxml2-dev \
   swig \
-  libmagickwand-dev \
-  libfftw3-dev \
-  liborc-0.4-dev \
-  libpango1.0-dev \
-  libgsf-1-dev
+  imagemagick-dev \
+  fftw-dev \
+  orc-dev \
+  pango-dev \
+  libgsf-dev
 
 # Build libvips
 cd /tmp
@@ -37,8 +42,5 @@ curl -O http://www.vips.ecs.soton.ac.uk/supported/$LIBVIPS_VERSION_MAJOR.$LIBVIP
 
 # Clean up
 cd /
-apt-get remove -y curl automake build-essential && \
-  apt-get autoremove -y && \
-  apt-get autoclean && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+apk del build-dependencies
+rm -rf /var/cache/apk/* /tmp/* /var/tmp/*

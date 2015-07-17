@@ -1,4 +1,4 @@
-FROM ubuntu:15.04
+FROM alpine:3.2
 MAINTAINER Will Jordan <will.jordan@gmail.com>
 
 ADD *.sh /root/
