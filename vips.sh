@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Installs Vips
+
 # Install dependencies
 apk --update add --virtual build-dependencies \
   gcc g++ make libc-dev \
@@ -15,7 +17,7 @@ apk --update add --virtual dev-dependencies \
   libwebp-dev \
   libexif-dev \
   libxml2-dev \
-  fftw-dev \
+  orc-dev
 
 apk --update add --virtual run-dependencies \
   glib \
@@ -23,14 +25,21 @@ apk --update add --virtual run-dependencies \
   libwebp \
   libexif \
   libxml2 \
-  fftw \
-  fftw-libs \
-  orc-dev \
+  orc
 
-# Building from git dependencies
-#  gobject-introspection \
-#  swig \
-#  gtk-doc \
+# Building from git
+apk --update add --virtual git-build-deps \
+  git \
+  gobject-introspection-dev \
+  swig \
+  gtk-doc \
+  autoconf
+
+# Install mozjpeg from source
+./mozjpeg.sh
+
+# Install fftw from source
+./fftw.sh
 
 # Optional dependencies (unused)
 #  tiff-dev \
@@ -38,26 +47,48 @@ apk --update add --virtual run-dependencies \
 #  pango-dev \
 #  imagemagick-dev \
 
-
 # Build libvips
 cd /tmp
-LIBVIPS_VERSION=$LIBVIPS_VERSION_MAJOR.$LIBVIPS_VERSION_MINOR.$LIBVIPS_VERSION_PATCH
-curl -O http://www.vips.ecs.soton.ac.uk/supported/$LIBVIPS_VERSION_MAJOR.$LIBVIPS_VERSION_MINOR/vips-$LIBVIPS_VERSION.tar.gz && \
-  tar zvxf vips-$LIBVIPS_VERSION.tar.gz && \
-  cd vips-$LIBVIPS_VERSION && \
-  FLAGS="-O2 -msse4.2 -ffast-math" && \
-  FLAGS="$FLAGS -ftree-vectorize -fdump-tree-vect-details" && \
+git clone git://github.com/jcupitt/libvips.git
+cd libvips
+./bootstrap.sh
+FLAGS="-Ofast" && \
   CFLAGS="$FLAGS" CXXFLAGS="$FLAGS" && \
   ./configure --enable-debug=no --without-python --without-gsf \
-  --with-jpeg-includes=/opt/mozjpeg/include \
-  --with-jpeg-libraries=/opt/mozjpeg/lib64 \
+#  --enable-deprecated=no \
   $1 && \
-  make && \
-  make install && \
-  ldconfig
+  make -j && \
+  make install
 
-# Clean up
+ldconfig || true
+
+## Clean up
 cd /
+apk del git-build-deps
 apk del build-dependencies
 apk del dev-dependencies
-rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+rm -rf \
+  /var/cache/apk/* \
+  /tmp/* \
+  /var/tmp/* \
+  /usr/local/share/gtk-doc/html/libvips/ \
+  || true
+
+# Clean up vips static libs
+rm -rf \
+  /usr/local/lib/libvips-cpp.a \
+  /usr/local/lib/libvips.a \
+  /usr/local/lib/libvipsCC* \
+  || true
+
+# Clean up mozjpeg static libs
+rm -rf \
+  /usr/lib/libjpeg.a \
+  /usr/lib/libturbojpeg.a \
+  || true
+
+# Clean up fftw static libs
+rm -rf \
+  /usr/lib/libfftw3.a \
+  /usr/lib/libfftw3_threads.a \
+  || true

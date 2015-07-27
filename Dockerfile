@@ -1,19 +1,16 @@
-FROM alpine:3.2
+FROM alpine:edge
 MAINTAINER Will Jordan <will.jordan@gmail.com>
 
-RUN apk --update add bash
+# Minimal bash layer
+RUN \
+  apk --update add bash && \
+  rm -rf /var/cache/apk/* && \
+  rm -rf /usr/share/terminfo/*
+
 WORKDIR /root
 
-ENV MOZJPEG_VERSION_MAJOR 3
-ENV MOZJPEG_VERSION_MINOR 1
-ADD mozjpeg.sh /root/
-RUN ./mozjpeg.sh
-
-ENV LIBVIPS_VERSION_MAJOR 8
-ENV LIBVIPS_VERSION_MINOR 0
-ENV LIBVIPS_VERSION_PATCH 2
-ADD vips.sh /root/
-RUN ./vips.sh
+ADD vips.sh mozjpeg.sh fftw.sh /root/
+RUN ./vips.sh && rm vips.sh mozjpeg.sh fftw.sh
 
 ENV CPATH /usr/local/include
 ENV LIBRARY_PATH /usr/local/lib
