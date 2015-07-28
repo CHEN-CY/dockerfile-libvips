@@ -1,17 +1,16 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
-# Install mozjpeg library to /usr
+# Install mozjpeg to /usr
 MOZJPEG_VERSION_MAJOR=3
 MOZJPEG_VERSION_MINOR=1
+MOZJPEG_VERSION=${MOZJPEG_VERSION_MAJOR}.${MOZJPEG_VERSION_MINOR}
+MOZJPEG_DIR=/tmp/mozjpeg
 
-cd /tmp
 apk --update add --virtual mozjpeg-build-deps \
   gcc g++ make libc-dev \
   curl \
-  automake \
-  autoconf \
   nasm \
   pkgconf \
   libtool \
@@ -20,26 +19,29 @@ apk --update add --virtual mozjpeg-build-deps \
 apk --update add --virtual mozjpeg-dev-deps \
   libpng-dev
 
-apk --update add \
+apk --update add --virtual mozjpeg-run-deps \
   libpng
 
-MOZJPEG_VERSION=${MOZJPEG_VERSION_MAJOR}.${MOZJPEG_VERSION_MINOR}
-MOZJPEG_FILE=v${MOZJPEG_VERSION}.tar.gz
-MOZJPEG_DIR=mozjpeg-${MOZJPEG_VERSION}
-curl -L -O https://github.com/mozilla/mozjpeg/archive/${MOZJPEG_FILE}
-tar -xf ${MOZJPEG_FILE}
-cd ${MOZJPEG_DIR}
-autoreconf -fiv
-mkdir build
-cd build
-FLAGS="-Ofast -flto" && \
-  CFLAGS=${FLAGS} CXXFLAGS=${FLAGS} && \
-  ../configure && \
-  make -j && \
-  make -i install prefix=/usr libdir=/usr/lib
+cd /tmp
+curl -L https://github.com/mozilla/mozjpeg/releases/download/v${MOZJPEG_VERSION}/mozjpeg-${MOZJPEG_VERSION}-release-source.tar.gz | tar -xz
+cd mozjpeg
+mkdir -p /usr/lib/bfd-plugins
+ln -sfv /usr/libexec/gcc/$(gcc -dumpmachine)/5.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
+FLAGS="-Os -flto" && CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}" \
+  ./configure \
+  --disable-static \
+  --prefix=/usr \
+  --mandir=${MOZJPEG_DIR}/man \
+  --infodir=${MOZJPEG_DIR}/info \
+  --docdir=${MOZJPEG_DIR}/doc
+
+make -j
+make install
+ldconfig || true
 
 # Clean up
-cd /tmp
-apk del mozjpeg-build-deps
-apk del mozjpeg-dev-deps
-rm -rf /tmp/${MOZJPEG_DIR}
+cd /
+apk del mozjpeg-build-deps mozjpeg-dev-deps
+rm -rf /var/cache/apk/*
+rm -rf /etc/ssl/certs/*
+rm -rf ${MOZJPEG_DIR}

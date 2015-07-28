@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/bin/sh
+
+# Install mozjpeg from source
+./mozjpeg.sh
 
 # Installs Vips
 
@@ -35,9 +38,6 @@ apk --update add --virtual git-build-deps \
   gtk-doc \
   autoconf
 
-# Install mozjpeg from source
-./mozjpeg.sh
-
 # Install fftw from source
 ./fftw.sh
 
@@ -52,13 +52,22 @@ cd /tmp
 git clone git://github.com/jcupitt/libvips.git
 cd libvips
 ./bootstrap.sh
-FLAGS="-Ofast" && \
-  CFLAGS="$FLAGS" CXXFLAGS="$FLAGS" && \
-  ./configure --enable-debug=no --without-python --without-gsf \
-#  --enable-deprecated=no \
-  $1 && \
-  make -j && \
-  make install
+LIBVIPS_DIR=/tmp/libvips
+mkdir -p /usr/lib/bfd-plugins
+ln -sfv /usr/libexec/gcc/$(gcc -dumpmachine)/5.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
+FLAGS="-Os -flto" && CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}" \
+  ./configure \
+  --enable-debug=no \
+  --without-python \
+  --without-gsf \
+  --disable-static \
+  --prefix=/usr \
+  --mandir=${LIBVIPS_DIR}/man \
+  --infodir=${LIBVIPS_DIR}/info \
+  --docdir=${LIBVIPS_DIR}/doc
+
+make -j
+make install
 
 ldconfig || true
 
@@ -69,6 +78,7 @@ apk del build-dependencies
 apk del dev-dependencies
 rm -rf \
   /var/cache/apk/* \
+  /etc/ssl/certs/* \
   /tmp/* \
   /var/tmp/* \
   /usr/local/share/gtk-doc/html/libvips/ \
@@ -76,19 +86,5 @@ rm -rf \
 
 # Clean up vips static libs
 rm -rf \
-  /usr/local/lib/libvips-cpp.a \
-  /usr/local/lib/libvips.a \
-  /usr/local/lib/libvipsCC* \
-  || true
-
-# Clean up mozjpeg static libs
-rm -rf \
-  /usr/lib/libjpeg.a \
-  /usr/lib/libturbojpeg.a \
-  || true
-
-# Clean up fftw static libs
-rm -rf \
-  /usr/lib/libfftw3.a \
-  /usr/lib/libfftw3_threads.a \
+  /usr/lib/libvipsCC* \
   || true
