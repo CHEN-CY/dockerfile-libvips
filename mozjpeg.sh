@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -e
 
 # Install mozjpeg to /usr
@@ -27,21 +26,22 @@ curl -L https://github.com/mozilla/mozjpeg/releases/download/v${MOZJPEG_VERSION}
 cd mozjpeg
 mkdir -p /usr/lib/bfd-plugins
 ln -sfv /usr/libexec/gcc/$(gcc -dumpmachine)/5.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
-FLAGS="-Os -flto" && CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}" \
+FLAGS="-Os -flto -march=native" && \
   ./configure \
   --disable-static \
+  --enable-shared \
+  --with-turbojpeg=no \
   --prefix=/usr \
+  --bindir=${MOZJPEG_DIR}/bin \
   --mandir=${MOZJPEG_DIR}/man \
   --infodir=${MOZJPEG_DIR}/info \
-  --docdir=${MOZJPEG_DIR}/doc
+  --datadir=${MOZJPEG_DIR}/data \
+  CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}"
 
-make -j
-make install
+make -j V=1
+make install-strip
 ldconfig || true
 
 # Clean up
 cd /
 apk del mozjpeg-build-deps mozjpeg-dev-deps
-rm -rf /var/cache/apk/*
-rm -rf /etc/ssl/certs/*
-rm -rf ${MOZJPEG_DIR}

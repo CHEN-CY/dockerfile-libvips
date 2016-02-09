@@ -5,12 +5,18 @@ Installs libvips on Alpine Linux as base image.
 
 ## How to use
 
-Download the image using:
+Download the image from Docker Hub:
 
 ```bash
 $ docker pull wjordan/libvips
 # .... pulling down image
 ```
+
+## How to build
+
+Just run `./libvips.docker.sh`.
+
+Uses [dockerize](https://github.com/docker/docker/issues/14080#issuecomment-132841442) script instead of `docker build` to create the Docker image.
 
 ## License
 

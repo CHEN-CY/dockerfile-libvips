@@ -1,7 +1,5 @@
 #!/bin/sh
-
-# Install mozjpeg from source
-./mozjpeg.sh
+set -e
 
 # Installs Vips
 
@@ -28,7 +26,8 @@ apk --update add --virtual run-dependencies \
   libwebp \
   libexif \
   libxml2 \
-  orc
+  orc \
+  fftw
 
 # Building from git
 apk --update add --virtual git-build-deps \
@@ -36,10 +35,8 @@ apk --update add --virtual git-build-deps \
   gobject-introspection-dev \
   swig \
   gtk-doc \
-  autoconf
-
-# Install fftw from source
-./fftw.sh
+  autoconf \
+  fftw-dev
 
 # Optional dependencies (unused)
 #  tiff-dev \
@@ -55,7 +52,7 @@ cd libvips
 LIBVIPS_DIR=/tmp/libvips
 mkdir -p /usr/lib/bfd-plugins
 ln -sfv /usr/libexec/gcc/$(gcc -dumpmachine)/5.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
-FLAGS="-Os -flto" && CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}" \
+FLAGS="-Os -flto -march=native" && \
   ./configure \
   --enable-debug=no \
   --without-python \
@@ -64,10 +61,11 @@ FLAGS="-Os -flto" && CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}" \
   --prefix=/usr \
   --mandir=${LIBVIPS_DIR}/man \
   --infodir=${LIBVIPS_DIR}/info \
-  --docdir=${LIBVIPS_DIR}/doc
+  --docdir=${LIBVIPS_DIR}/doc \
+  CFLAGS="${FLAGS}" CXXFLAGS="${FLAGS}" LDFLAGS="${FLAGS}"
 
-make -j
-make install
+make -j V=1
+make install-strip
 
 ldconfig || true
 
@@ -77,10 +75,6 @@ apk del git-build-deps
 apk del build-dependencies
 apk del dev-dependencies
 rm -rf \
-  /var/cache/apk/* \
-  /etc/ssl/certs/* \
-  /tmp/* \
-  /var/tmp/* \
   /usr/local/share/gtk-doc/html/libvips/ \
   || true
 
