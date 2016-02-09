@@ -19,7 +19,8 @@ apk --update add --virtual dev-dependencies \
   libexif-dev \
   libxml2-dev \
   orc-dev \
-  fftw-dev
+  fftw-dev \
+  lcms2-dev
 
 apk --update add --virtual run-dependencies \
   glib \
@@ -28,7 +29,8 @@ apk --update add --virtual run-dependencies \
   libexif \
   libxml2 \
   orc \
-  fftw
+  fftw \
+  lcms2
 
 # Building from git
 apk --update add --virtual git-build-deps \
@@ -52,7 +54,7 @@ cd libvips
 LIBVIPS_DIR=/tmp/libvips
 mkdir -p /usr/lib/bfd-plugins
 ln -sfv /usr/libexec/gcc/$(gcc -dumpmachine)/5.1.0/liblto_plugin.so /usr/lib/bfd-plugins/
-FLAGS="-Os -flto -march=native" && \
+FLAGS="-Os -flto" && \
   ./configure \
   --enable-debug=no \
   --without-python \
