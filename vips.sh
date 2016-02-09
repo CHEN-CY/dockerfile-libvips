@@ -18,7 +18,8 @@ apk --update add --virtual dev-dependencies \
   libwebp-dev \
   libexif-dev \
   libxml2-dev \
-  orc-dev
+  orc-dev \
+  fftw-dev
 
 apk --update add --virtual run-dependencies \
   glib \
@@ -35,8 +36,7 @@ apk --update add --virtual git-build-deps \
   gobject-introspection-dev \
   swig \
   gtk-doc \
-  autoconf \
-  fftw-dev
+  autoconf
 
 # Optional dependencies (unused)
 #  tiff-dev \
