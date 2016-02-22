@@ -1,22 +1,16 @@
-# [Dockerfile](https://registry.hub.docker.com/u/wjordan/libvips/) for libvips
+# [Dockerfile](https://registry.hub.docker.com/u/wjordan/libvips/) for [libvips](https://github.com/jcupitt/libvips)
 [![](https://badge.imagelayers.io/wjordan/libvips:latest.svg)](https://imagelayers.io/?images=wjordan/libvips:latest 'wjordan/libvips:latest')
 
-Installs libvips on Alpine Linux as base image.
+Installs [libvips](https://github.com/jcupitt/libvips) in an Alpine Linux Docker image.
 
 ## How to use
 
-Download the image from Docker Hub:
+Just pull/run the image from Docker Hub:
 
 ```bash
-$ docker pull wjordan/libvips
-# .... pulling down image
+$ docker run wjordan/libvips vips -v
+vips-8.2.2-Thu Feb 11 23:45:16 UTC 2016
 ```
-
-## How to build
-
-Just run `./libvips.docker.sh`.
-
-Uses [dockerize](https://github.com/docker/docker/issues/14080#issuecomment-132841442) script instead of `docker build` to create the Docker image.
 
 ## License
 
